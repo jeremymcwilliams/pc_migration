@@ -1,0 +1,7 @@
+Desktop
+*.lock
+*.DS_Store
+*.out
+.DS_Store
+ftpinfo.php
+omekainfo.php
