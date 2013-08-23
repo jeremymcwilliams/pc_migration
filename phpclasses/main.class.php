@@ -344,13 +344,13 @@ class utilities{
 
             //echo $directory;
             /* gets metadata array from metadata.txt*/
-            if ($md_array=$this->metadataDotTextCheck($directory)){
+         //   if ($md_array=$this->metadataDotTextCheck($directory)){
                 
-                        $a=$this->md_parse($md_array);
+                        //$a=$this->md_parse($md_array);
                         //var_dump($a);
 
                     /* gets exifdata from directory    */
-                    
+                    $a=array();
                     $keys=array();  
                     $ex_array=array();
                     
@@ -373,13 +373,17 @@ class utilities{
                                 $full=$collinfo["full"];
        
                                 
-                                $exif=$this->exiftooldata($entry, $directory);
-
+                                $exif=$this->exiftooldata($entry, $directory, $k);
+                                
+                               // var_dump($exif);
+                                
                                 $a[$full][$k]["Dimensions"]=$exif["Dimensions"];
                                 $a[$full][$k]["Archive File"]=$entry;
                                 $a[$full][$k]["File Type"]=$fileType;
                                 $a[$full][$k]["Date"]=$exif["Date"];
-                                
+                                $a[$full][$k]["Title"]=$exif["Title"];
+                                $a[$full][$k]["Keywords"]=$exif["Keywords"];
+                                $a[$full][$k]["Shoot"]=$exif["Shoot"];
                                 
 
                             }
@@ -392,13 +396,13 @@ class utilities{
                     
                         closedir($handle);
                     }           
-                    
+                    var_dump($a);
 
                     
                     $this->collectionArrayParse($a);
             
                     echo "<p>Proceed to <a href='index.php?state=step3'>Step 3</a></p>";
-            }
+           // }
 
             
 
@@ -419,7 +423,115 @@ class utilities{
     }   
     
 	
+    function exiftooldata($file, $folder, $key){
+            $exif=array();
+            
+            
+        //$file="CAM-V-0905-0002.tif";
+        //$folder="HowardHallRaw";
+        $im=pubcomda::parentdir."/$folder/$file";
+        
+        //$im='"$im"';
 
+        
+        //$command="exiftool -php -ImageWidth -ImageHeight -DateTimeOriginal -MetadataDate \"$im\"";
+        
+        $command="exiftool -php -Keywords -ObjectName -ImageWidth -ImageHeight -DateTimeOriginal -MetadataDate \"$im\"";
+        
+        
+        //echo "<p>$command</p>";
+        
+        exec($command, $output, $return);
+        
+        //var_dump($output);
+        
+        //echo $output[3];
+        
+        $s=$output[1];
+        $k=$output[2];
+        $on=$output[3];
+        $w=$output[4];
+        $h=$output[5];
+        $dt=$output[6];
+        
+        $source=$this->splitit($s);
+        $wi=$this->splitit($w);
+        $he=$this->splitit($h);
+        $da=$this->splitit($dt);
+        $kw=$this->splitit($k);
+        $sho=$this->splitit($on);
+        //echo "<p>$kw</p>";
+        
+        $keywords=$this->formatKeywords($kw);
+        //echo "<br>$source | $width | $height<br>";
+        
+        $title=$this->formatTitle($source);
+        $shoot=$this->formatShoot($sho, $key);
+        
+        //echo "<p>title: $title</p>";
+        $exif["Title"]=$title;
+        $exif["Keywords"]=$keywords;
+        $exif["Shoot"]=$shoot;
+        
+        
+        $width= intval($wi);
+        $height=intval($he);
+        
+        $hd=round($height/300, 2, PHP_ROUND_HALF_EVEN);
+        $wd=round($width/300, 2, PHP_ROUND_HALF_EVEN);
+        
+        $dim="$hd in. x $wd in.";
+        $exif["Dimensions"]=$dim;
+        
+        
+        $date=$this->formatDate($da);
+        $exif["Date"]=$date;
+        
+        return $exif;
+        
+        //return $date;
+        //return $dim;
+        //echo $dim;
+        
+        
+/*
+original image resolution must be obtained/calculated 
+ * before conversion to jpg
+ * (height(pixels) / 300 = height in. x width(pixels) / 300 = width in.)
+        
+*/      
+        
+        
+    }
+    
+    function formatKeywords($kw){
+        
+        $string="";
+        // example: Array("academic","graduate campus","graduate school","indoors","people")
+        
+        $a=str_replace("Array(", "", $kw);
+        $b=str_replace(")", "", $a);
+        $c=str_replace('"', '', $b);
+        
+        $d=explode(",", $c);
+        
+        $n=0;
+        foreach ($d as $e){
+            
+            $key=trim($e);
+            if ($n==0){$string.=$key;}
+            else{$string.=", ".$key;}
+            $n++;
+
+        }
+        
+        //echo "<p>$c</p>";
+        
+        $string=rtrim($string, " ,");
+        return $string;
+        
+        
+    }
     
     
     /* for a file name (no extension), like "CAM-B-0410-0023", returns array $array["prefix"]="CAM", $array["suffix"]="B", $array["full"]="CAM-B"*/
@@ -488,118 +600,7 @@ class utilities{
 
     }
     
-    	
-	
 
-	function md_parse($md){
-		
-		$csv_prep=array();
-		
-		$coll_array=array();
-
-		foreach ($md as $entry){
-			
-			$c=0;
-			
-			foreach ($entry as $field=>$value){
-									
-						
-				 $field=iconv("UTF-16", "UTF-8",utf8_encode($field));		
-				 $value=iconv("UTF-16", "UTF-8",utf8_encode($value));	
-				
-				
-				if ($c==0){
-					
-					if (strlen($value)<10){$key=false;}
-					else{$key=$value;}
-					if ($key){
-					//echo "<p>key: $value</p>";
-                        
-                        $r=$this->parseFilename($value);
-                        $k=explode("||||", $r);
-                        $coll=$k[0];
-                        if (!in_array($coll, $coll_array)){
-                           # array_push($coll_array, $coll);
-                            
-                        }
-                        
-                        $coll_array[$coll][$key]["Filename"]=$value;
-
-						$csv_prep[$key]["Filename"]=$value;
-						
-					}
-				}
-				else{
-					if ($key){
-						
-						//echo "<p>$c $field: $value</p>";
-						
-						
-						
-						switch ($field) {
-							case "Title":   //title
-								//echo "<p>$field: $value</p>";
-								//$csv_prep[$key]["Shoot"]=$value;
-                                
-                                $newdata=$this->formatShoot($value, $key);
-                                
-                                $coll_array[$coll][$key]["Shoot"]=$newdata;
-								break;
-							
-							case "Contact Creator":
-								//$csv_prep[$key]["Photographer"]=$value;
-                                $coll_array[$coll][$key]["Photographer"]=$value;
-								break;
-							
-							case "Keywords":
-                                
-                                $keywords=str_replace(",", ", ", $value);
-                                $keywords=rtrim($keywords);
-                                
-                                $coll_array[$coll][$key][$field]=$keywords;
-                                
-                                
-                                break;
-							case "Instructions":
-							case "City":
-							case "State/Province":
-							case "Country":
-							case "Rating":
-								//$csv_prep[$key][$field]=$value;
-                                $coll_array[$coll][$key][$field]=$value;
-								break;
-							
-							default:
-								//$csv_prep[$key][$field]=$value;
-								break;
-						}
-						
-						
-						//echo "<p>$field: $value</p>";
-					
-					
-					
-					}
-					
-				}
-
-				
-				$c++;
-			}
-			
-
-		}
-	//	$this->collectionArrayParse($coll_array);
-		
-		//return $csv_prep;
-		
-		return $coll_array;
-		
-	}
-
-	
- 	
-	
 	function splitit($string){
 		
 		$r=explode("=>",$string);
@@ -610,7 +611,20 @@ class utilities{
 	}
 	
     function formatShoot($shoot, $title){
-        /* example: CAS 100609 Campus Details*/
+        
+        /* example title: G-PEO-C */
+        
+        /* example shoot: CAS 100609 Campus Details*/
+        
+        /*goal: CAS-0109-Athletics*/
+        /*"GRAD 130619 Grad School" | G-PEO-C1-0613-0035*/
+        
+        $shoot=trim($shoot, '" ');
+        
+        
+        echo "<p>$shoot | $title</p>";
+        
+        
         $x=explode(" ", $shoot);
         
         $school=array_shift($x);
@@ -624,6 +638,17 @@ class utilities{
         $new=$school."-".$date."-".$desc;
         return $new;
 
+    }
+    
+    function formatTitle($data){
+        $x=explode("/", $data);
+        $file=array_pop($x);
+        $y=explode(".", $file);
+        $title=$y[0];
+        return $title;
+        
+        
+        
     }
     
     
@@ -649,68 +674,7 @@ class utilities{
 		
 	}
 
-	function exiftooldata($file, $folder){
-			$exif=array();
-			
-			
-		//$file="CAM-V-0905-0002.tif";
-		//$folder="HowardHallRaw";
-		$im=pubcomda::parentdir."/$folder/$file";
-		
-		//$im='"$im"';
 
-		
-		$command="exiftool -php -ImageWidth -ImageHeight -DateTimeOriginal -MetadataDate \"$im\"";
-		
-		//echo "<p>$command</p>";
-		
-		exec($command, $output, $return);
-		
-		//var_dump($output);
-		
-		//echo $output[3];
-		
-		$s=$output[1];
-		$w=$output[2];
-		$h=$output[3];
-		$dt=$output[4];
-		
-		$source=$this->splitit($s);
-		$wi=$this->splitit($w);
-		$he=$this->splitit($h);
-		$da=$this->splitit($dt);
-	
-		//echo "<br>$source | $width | $height<br>";
-		
-		$width= intval($wi);
-		$height=intval($he);
-		
-		$hd=round($height/300, 2, PHP_ROUND_HALF_EVEN);
-		$wd=round($width/300, 2, PHP_ROUND_HALF_EVEN);
-		
-		$dim="$hd in. x $wd in.";
-		$exif["Dimensions"]=$dim;
-		
-		
-		$date=$this->formatDate($da);
-		$exif["Date"]=$date;
-		
-		return $exif;
-		
-		//return $date;
-		//return $dim;
-		//echo $dim;
-		
-		
-/*
-original image resolution must be obtained/calculated 
- * before conversion to jpg
- * (height(pixels) / 300 = height in. x width(pixels) / 300 = width in.)
-		
-*/		
-		
-		
-	}
 
 
     function collectionArrayParse($array){
@@ -791,7 +755,7 @@ original image resolution must be obtained/calculated
             
             $fields=array();
             
-            array_push($fields, $md["Filename"]);
+            array_push($fields, $md["Title"]);   //new exif data "title"
             array_push($fields, $md["Shoot"]);
             array_push($fields, $md["Keywords"]);
             array_push($fields, $md["Instructions"]);
@@ -805,7 +769,7 @@ original image resolution must be obtained/calculated
             array_push($fields, $md["Rating"]);
             array_push($fields, $md["File Type"]);
             array_push($fields, $md["Dimensions"]);
-            $filepath="http://pubcomda.lclark.edu/tempfiles/".$md["Filename"].".jpg";
+            $filepath="http://pubcomda.lclark.edu/tempfiles/".$md["Title"].".jpg";
             array_push($fields, $filepath);
             //var_dump($md);
             
@@ -907,6 +871,111 @@ original image resolution must be obtained/calculated
     }
     
 /* OLD FUNCTIONS FROM INITIAL MIGRATION    */
+ /*   function md_parse($md){
+        
+        $csv_prep=array();
+        
+        $coll_array=array();
+
+        foreach ($md as $entry){
+            
+            $c=0;
+            
+            foreach ($entry as $field=>$value){
+                                    
+                        
+                 $field=iconv("UTF-16", "UTF-8",utf8_encode($field));       
+                 $value=iconv("UTF-16", "UTF-8",utf8_encode($value));   
+                
+                
+                if ($c==0){
+                    
+                    if (strlen($value)<10){$key=false;}
+                    else{$key=$value;}
+                    if ($key){
+                    //echo "<p>key: $value</p>";
+                        
+                        $r=$this->parseFilename($value);
+                        $k=explode("||||", $r);
+                        $coll=$k[0];
+                        if (!in_array($coll, $coll_array)){
+                           # array_push($coll_array, $coll);
+                            
+                        }
+                        
+                        $coll_array[$coll][$key]["Filename"]=$value;
+
+                        $csv_prep[$key]["Filename"]=$value;
+                        
+                    }
+                }
+                else{
+                    if ($key){
+                        
+                        //echo "<p>$c $field: $value</p>";
+                        
+                        
+                        
+                        switch ($field) {
+                            case "Title":   //title
+                                //echo "<p>$field: $value</p>";
+                                //$csv_prep[$key]["Shoot"]=$value;
+                                
+                                $newdata=$this->formatShoot($value, $key);
+                                
+                                $coll_array[$coll][$key]["Shoot"]=$newdata;
+                                break;
+                            
+                            case "Contact Creator":
+                                //$csv_prep[$key]["Photographer"]=$value;
+                                $coll_array[$coll][$key]["Photographer"]=$value;
+                                break;
+                            
+                            case "Keywords":
+                                
+                                $keywords=str_replace(",", ", ", $value);
+                                $keywords=rtrim($keywords);
+                                
+                                $coll_array[$coll][$key][$field]=$keywords;
+                                
+                                
+                                break;
+                            case "Instructions":
+                            case "City":
+                            case "State/Province":
+                            case "Country":
+                            case "Rating":
+                                //$csv_prep[$key][$field]=$value;
+                                $coll_array[$coll][$key][$field]=$value;
+                                break;
+                            
+                            default:
+                                //$csv_prep[$key][$field]=$value;
+                                break;
+                        }
+                        
+                        
+                        //echo "<p>$field: $value</p>";
+                    
+                    
+                    
+                    }
+                    
+                }
+
+                
+                $c++;
+            }
+            
+
+        }
+    //  $this->collectionArrayParse($coll_array);
+        
+        //return $csv_prep;
+        
+        return $coll_array;
+        
+    } */
 /*  
     function metadataDotTextCheck($directory){
             $dir= pubcomda::parentdir."/$directory";    
