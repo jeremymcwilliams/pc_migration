@@ -97,8 +97,9 @@ putenv("DYLD_LIBRARY_PATH=" . getenv("MAGICK_HOME") . "/lib");
         ?>
         
         <h3>Step 1: Add metadata to images in Adobe Bridge</h3>
-        <!--
+       
         <p>(add some detailed instructions/screenshots here)</p>
+        <!--
         <p>Steps:</p>
         <ul>
             <li>Choose Shoot directory from Aperture</li>
@@ -384,6 +385,7 @@ class utilities{
                                 $a[$full][$k]["Title"]=$exif["Title"];
                                 $a[$full][$k]["Keywords"]=$exif["Keywords"];
                                 $a[$full][$k]["Shoot"]=$exif["Shoot"];
+								$a[$full][$k]["Photographer"]=$exif["Photographer"];
                                 
 
                             }
@@ -436,7 +438,7 @@ class utilities{
         
         //$command="exiftool -php -ImageWidth -ImageHeight -DateTimeOriginal -MetadataDate \"$im\"";
         
-        $command="exiftool -php -Keywords -ObjectName -ImageWidth -ImageHeight -DateTimeOriginal -MetadataDate \"$im\"";
+        $command="exiftool -php -Keywords -ObjectName -ImageWidth -ImageHeight -Creator -DateTimeOriginal -MetadataDate \"$im\"";
         
         
         //echo "<p>$command</p>";
@@ -452,7 +454,8 @@ class utilities{
         $on=$output[3];
         $w=$output[4];
         $h=$output[5];
-        $dt=$output[6];
+		$cr=$output[6];
+        $dt=$output[7];
         
         $source=$this->splitit($s);
         $wi=$this->splitit($w);
@@ -460,19 +463,23 @@ class utilities{
         $da=$this->splitit($dt);
         $kw=$this->splitit($k);
         $sho=$this->splitit($on);
-        //echo "<p>$kw</p>";
+		$cre=$this->splitit($cr);
+		
+        
         
         $keywords=$this->formatKeywords($kw);
         //echo "<br>$source | $width | $height<br>";
         
         $title=$this->formatTitle($source);
         $shoot=$this->formatShoot($sho, $key);
-        
+        $photographer=$this->formatPhotographer($cre);
+		echo "<p>$photographer</p>";
+		
         //echo "<p>title: $title</p>";
         $exif["Title"]=$title;
         $exif["Keywords"]=$keywords;
         $exif["Shoot"]=$shoot;
-        
+        $exif["Photographer"]=$photographer;
         
         $width= intval($wi);
         $height=intval($he);
@@ -504,6 +511,14 @@ original image resolution must be obtained/calculated
         
     }
     
+	function formatPhotographer($cre){
+		
+		$photographer=trim($cre, '" ');
+		return $photographer;	
+		
+	}
+	
+	
     function formatKeywords($kw){
         
         $string="";
