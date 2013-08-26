@@ -398,7 +398,7 @@ class utilities{
                     
                         closedir($handle);
                     }           
-                    var_dump($a);
+                    //var_dump($a);
 
                     
                     $this->collectionArrayParse($a);
@@ -423,14 +423,7 @@ class utilities{
         
         
     }  
-    function splitit($string){
-        
-        $r=explode("=>",$string);
-        $val=$r[1];
-        $val=rtrim($val, ",");
-        return $val;
 
-    }
 
     function newSplitIt($string, $key){
         $pair=array();
@@ -660,7 +653,7 @@ class utilities{
         $shoot=trim($shoot, '" ');
         
         
-        echo "<p>$shoot | $title</p>";
+        //echo "<p>$shoot | $title</p>";
         
         
         $x=explode(" ", $shoot);
@@ -841,11 +834,10 @@ class utilities{
 
         $r="";
         $c=strlen($suf);
-                //echo "$key $sub $c";
+        echo "<p>Collection: $coll | C: $c | Suffix: $suf | Prefix: $pre</p>";
         switch ($c){
             case 1:
-            
-            $r=$collections[$pre][$suf];
+                $r=$collections[$pre][$suf];
             break;
 
             case 2:
@@ -1112,7 +1104,14 @@ class utilities{
         
         
     }
-    
+    function splitit($string){
+        
+        $r=explode("=>",$string);
+        $val=$r[1];
+        $val=rtrim($val, ",");
+        return $val;
+
+    }    
  * 
  * 
  * */
