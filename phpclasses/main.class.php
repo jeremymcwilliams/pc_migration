@@ -422,65 +422,109 @@ class utilities{
         
         
         
-    }   
-    
-	
-    function exiftooldata($file, $folder, $key){
-            $exif=array();
-            
-            
-        //$file="CAM-V-0905-0002.tif";
-        //$folder="HowardHallRaw";
-        $im=pubcomda::parentdir."/$folder/$file";
+    }  
+    function splitit($string){
         
-        //$im='"$im"';
+        $r=explode("=>",$string);
+        $val=$r[1];
+        $val=rtrim($val, ",");
+        return $val;
 
+    }
+
+    function newSplitIt($string, $key){
+        $pair=array();
+        $whitelist=array("SourceFile","Keywords","ObjectName","ImageWidth","ImageHeight","Creator","DateTimeOriginal");
+
+        $r=explode("=>",$string);
         
-        //$command="exiftool -php -ImageWidth -ImageHeight -DateTimeOriginal -MetadataDate \"$im\"";
+        $field=trim($r[0], '" ');
+        if (in_array($field, $whitelist)){
+            $val=$r[1];
+            $val=rtrim($val, ",");
+            
+            switch ($field){
+                
+                case "SourceFile":
+                    $title=$this->formatTitle($val);
+                    $pair["Title"]=$title;                  
+                    break;
+                
+                case "Keywords":
+                    $keywords=$this->formatKeywords($val);
+                    $pair["Keywords"]=$keywords;
+                    break; 
+                
+                case "ObjectName":
+                    $shoot=$this->formatShoot($val, $key);
+                    $pair["Shoot"]=$shoot;
+                    break;
+                
+                case "ImageWidth":
+                    $pair["Width"]=$val;                   
+                    break;
+                
+                case "ImageHeight":
+                    $pair["Height"]=$val;
+                    break;
+                
+                case "Creator":
+                    $photographer=$this->formatPhotographer($val);
+                    $pair["Photographer"]=$photographer;
+                    break;
+                        
+                case "DateTimeOriginal":
+                    $date=$this->formatDate($val);
+                    $pair["Date"]=$date;
+                    
+                    break;
+    
+                
+            }
+            
+           // $pair[$field]=$value;
+            return $pair;
+            
+            
+            
+           // return $val;            
+            
+        }
+        else {return false;}
+
+
+
+    }
+
+
+    
+    /* This will attempt to handle exiftool data smarter, so it relies on value matching rather than sequence*/
+  
+    function exiftooldata($file, $folder, $key){
         
+            $exif=array();
+
+        $im=pubcomda::parentdir."/$folder/$file";
+
         $command="exiftool -php -Keywords -ObjectName -ImageWidth -ImageHeight -Creator -DateTimeOriginal -MetadataDate \"$im\"";
-        
-        
-        //echo "<p>$command</p>";
-        
+
         exec($command, $output, $return);
         
-        //var_dump($output);
+        foreach ($output as $out){
+            
+            if ($pair=$this->newSplitIt($out, $key)){                
+                $f=key($pair);
+                $v=$pair[$f];
+                $exif[$f]=$v;
+            }           
+        }
         
-        //echo $output[3];
+       // var_dump($exif);
         
-        $s=$output[1];
-        $k=$output[2];
-        $on=$output[3];
-        $w=$output[4];
-        $h=$output[5];
-		$cr=$output[6];
-        $dt=$output[7];
+
         
-        $source=$this->splitit($s);
-        $wi=$this->splitit($w);
-        $he=$this->splitit($h);
-        $da=$this->splitit($dt);
-        $kw=$this->splitit($k);
-        $sho=$this->splitit($on);
-		$cre=$this->splitit($cr);
-		
-        
-        
-        $keywords=$this->formatKeywords($kw);
-        //echo "<br>$source | $width | $height<br>";
-        
-        $title=$this->formatTitle($source);
-        $shoot=$this->formatShoot($sho, $key);
-        $photographer=$this->formatPhotographer($cre);
-		echo "<p>$photographer</p>";
-		
-        //echo "<p>title: $title</p>";
-        $exif["Title"]=$title;
-        $exif["Keywords"]=$keywords;
-        $exif["Shoot"]=$shoot;
-        $exif["Photographer"]=$photographer;
-        
+        $wi=$exif["Width"];
+        $he=$exif["Height"];
         $width= intval($wi);
         $height=intval($he);
         
@@ -489,28 +533,15 @@ class utilities{
         
         $dim="$hd in. x $wd in.";
         $exif["Dimensions"]=$dim;
-        
-        
-        $date=$this->formatDate($da);
-        $exif["Date"]=$date;
+
         
         return $exif;
-        
-        //return $date;
-        //return $dim;
-        //echo $dim;
-        
-        
-/*
-original image resolution must be obtained/calculated 
- * before conversion to jpg
- * (height(pixels) / 300 = height in. x width(pixels) / 300 = width in.)
-        
-*/      
-        
-        
-    }
+  
+    } 
     
+	
+    
+
 	function formatPhotographer($cre){
 		
 		$photographer=trim($cre, '" ');
@@ -616,15 +647,7 @@ original image resolution must be obtained/calculated
     }
     
 
-	function splitit($string){
-		
-		$r=explode("=>",$string);
-		$val=$r[1];
-		$val=rtrim($val, ",");
-		return $val;
 
-	}
-	
     function formatShoot($shoot, $title){
         
         /* example title: G-PEO-C */
@@ -1030,7 +1053,69 @@ original image resolution must be obtained/calculated
             
             return $arr; 
         } 
- */
+     function exiftooldata_old($file, $folder, $key){
+            $exif=array();
+
+        $im=pubcomda::parentdir."/$folder/$file";
+
+        $command="exiftool -php -Keywords -ObjectName -ImageWidth -ImageHeight -Creator -DateTimeOriginal -MetadataDate \"$im\"";
+
+        exec($command, $output, $return);
+
+        $s=$output[1];
+        $k=$output[2];
+        $on=$output[3];
+        $w=$output[4];
+        $h=$output[5];
+        $cr=$output[6];
+        $dt=$output[7];
+        
+        $source=$this->splitit($s);
+        $wi=$this->splitit($w);
+        $he=$this->splitit($h);
+        $da=$this->splitit($dt);
+        $kw=$this->splitit($k);
+        $sho=$this->splitit($on);
+        $cre=$this->splitit($cr);
+        
+        
+        
+        $keywords=$this->formatKeywords($kw);
+        //echo "<br>$source | $width | $height<br>";
+        
+        $title=$this->formatTitle($source);
+        $shoot=$this->formatShoot($sho, $key);
+        $photographer=$this->formatPhotographer($cre);
+        echo "<p>$photographer</p>";
+        
+        //echo "<p>title: $title</p>";
+        $exif["Title"]=$title;
+        $exif["Keywords"]=$keywords;
+        $exif["Shoot"]=$shoot;
+        $exif["Photographer"]=$photographer;
+        
+        $width= intval($wi);
+        $height=intval($he);
+        
+        $hd=round($height/300, 2, PHP_ROUND_HALF_EVEN);
+        $wd=round($width/300, 2, PHP_ROUND_HALF_EVEN);
+        
+        $dim="$hd in. x $wd in.";
+        $exif["Dimensions"]=$dim;
+        
+        
+        $date=$this->formatDate($da);
+        $exif["Date"]=$date;
+        
+        return $exif;
+   
+        
+        
+    }
+    
+ * 
+ * 
+ * */
 
 
 
