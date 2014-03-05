@@ -179,7 +179,11 @@
                 "5"=>"Spring 2012 (MISC-D5)",
                 "6"=>"Fall 2012 (MISC-D6)",
                 "7"=>"Winter 2013 (MISC-D7)",
-                "8"=>"Spring 2013 (MISC-D8)"
+                "8"=>"Spring 2013 (MISC-D8)",
+                "9"=>"Fall 2013 (MISC-D9)",
+                "10"=>"Winter 2014 (MISC-D10)",
+                "11"=>"Spring 2014 (MISC-D11)",
+                "12"=>"Fall 2014 (MISC-D12)"
             ),
             "E"=>"Hoffman Gallery Shows (MISC-E)",
             "F"=>array( /* Print Project   */
