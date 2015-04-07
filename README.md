@@ -2,9 +2,9 @@ Code base for the Lewis & Clark Publications & Communications department's digit
 
 For a given export directory of images and metadata, the code does the following:
 
-1) Creates Omeka-ready collection specific csv-files
-2) Uses exiftool to gather metadata from images
-3) Possibly FTPs images to appropriate spots
+1) Creates Omeka-ready collection specific csv-files\n
+2) Uses exiftool to gather metadata from images\n
+3) Possibly FTPs images to appropriate spots\n
 
 
 Uses the following:
