@@ -12,7 +12,7 @@ Uses the following:<br/>
 -html5 boilerplate<br/>
 
 
-Some Requirements:
+Some Requirements:<br/><br/>
 1) Symbolic link to Desktop set in your local code directory
 -this may require un-doing and re-doing the symbolic link on a local computer
 -in terminal, navigate to /Library/WebServer/Documents/pubcom/ and do the following:<br/>
