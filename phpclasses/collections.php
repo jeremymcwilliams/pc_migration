@@ -51,6 +51,10 @@
                 "11"=>"West (CAM-R11)",
                 "12"=>"Holmes (CAM-R12)"
             ),
+            "S"=?array( /* Templeton Campus Center */
+            	"parentlabel"=>"Templeton Campus Center",
+            	"1"=>"Career Center (CAM-S1)"
+            ),
             "S"=>"Templeton Campus Center (CAM-S)",
             "T"=>"Watzek Library (CAM-T)",
             "U"=>"Hoffman Gallery (CAM-U)",
@@ -118,7 +122,7 @@
             "parentlabel"=>"Programs",
             "A"=>"Overseas and Off Campus (PROG-A)",
             "B"=>"College Outdoors (PROG-B)",
-            "C"=>"Student Leadership and Service (PROG-C)",
+            "C"=>"Career Center (PROG-C)",
             "D"=>"Academic English Studies (PROG-D)",
             "E"=>"Entrepreneurship (Winterim) (PROG-E)"
         ),
@@ -220,7 +224,8 @@
         "L-EVNT"=>array(
             "parentlabel"=>"Law Events",
             "A"=>"Commencement (L-EVNT-A)",
-            "B"=>"Receptions (L-EVNT-A)"            
+            "B"=>"Receptions (L-EVNT-A)",
+            "C"=>"Academic Event/Symposia (L-EVNT-C)"            
         ),
         "L-MISC"=>array(
             "parentlabel"=>"Law Miscellaneous",
