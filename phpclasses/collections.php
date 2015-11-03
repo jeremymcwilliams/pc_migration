@@ -51,7 +51,7 @@
                 "11"=>"West (CAM-R11)",
                 "12"=>"Holmes (CAM-R12)"
             ),
-            "S"=array( /* Templeton Campus Center */
+            "S"=>array( /* Templeton Campus Center */
             	"parentlabel"=>"Templeton Campus Center",
             	"1"=>"Career Center (CAM-S1)"
             ),
