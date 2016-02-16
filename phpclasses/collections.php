@@ -110,7 +110,7 @@
             ),
             "C"=>array( /* Social Sciences  */
                 "parentlabel"=>"Social Sciences",
-                "1"=>"Communications (DIV-C1)",
+                "1"=>"Rhetoric and Media Studies (DIV-C1)",
                 "2"=>"Economics (DIV-C2)",
                 "3"=>"International Affairs (DIV-C3)",
                 "4"=>"Political Science (DIV-C4)",

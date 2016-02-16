@@ -511,16 +511,11 @@ class utilities{
                 $exif[$f]=$v;
             }           
         }
-        
-       // var_dump($exif);
-        
 
-        
         $wi=$exif["Width"];
         $he=$exif["Height"];
         $width= intval($wi);
-        $height=intval($he);
-        
+        $height=intval($he);        
         $hd=round($height/300, 2, PHP_ROUND_HALF_EVEN);
         $wd=round($width/300, 2, PHP_ROUND_HALF_EVEN);
         
