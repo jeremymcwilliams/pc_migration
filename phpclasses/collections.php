@@ -242,7 +242,12 @@
                 "2"=>"Fall 2011 (L-MISC-B2)",
                 "3"=>"Spring 2012 (L-MISC-B3)",
                 "4"=>"Fall 2012 (L-MISC-B4)",
-                "5"=>"Spring 2013 (L-MISC-B5)"
+                "5"=>"Spring 2013 (L-MISC-B5)",
+                "6"=>"Fall 2013 (L-MISC-B6)",
+                "7"=>"Spring 2014 (L-MISC-B7)",
+                "8"=>"Fall 2014 (L-MISC-B8)",
+                "9"=>"Spring 2015 (L-MISC-B9)",
+                "10"=>"Fall 2105 (L-MISC-B10)"
             ),
             "C"=>array( /* Print Project */
                 "parentlabel"=>"Print Project",
