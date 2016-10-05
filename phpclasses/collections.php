@@ -252,7 +252,7 @@
                 "12"=>"Fall 2016 (L-MISC-B12)",
                 "13"=>"Spring 2017 (L-MISC-B13)",
                 "14"=>"Fall 2017 (L-MISC-B14)",
-                "15"=>"Spring 2018 (L-MISC-B15)
+                "15"=>"Spring 2018 (L-MISC-B15)"
             ),
             "C"=>array( /* Print Project */
                 "parentlabel"=>"Print Project",
