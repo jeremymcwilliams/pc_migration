@@ -5,15 +5,15 @@
 /* class pubcomda has interface elements*/
 /* utilities has all the processing code */
 
-class pubcomda extends utilities{ 
-	
+class pubcomda extends utilities{
+
 	const parentdir = 'Desktop';
 	const usageTerms = "All Rights Reserved. No use without prior authorization.";
 	const copyrightNotice = "Copyright Lewis & Clark, Portland, Oregon.";
 
 
 	function __construct(){
-	   
+
 		date_default_timezone_set("America/Los_Angeles");
 putenv("MAGICK_HOME=/opt/local/var/macports/software/ImageMagick");
 putenv("PATH=" . getenv("MAGICK_HOME") . "/bin:" . getenv("PATH"));
@@ -25,31 +25,31 @@ putenv("DYLD_LIBRARY_PATH=" . getenv("MAGICK_HOME") . "/lib");
 		$this->controller();
 
 	}
-	
-	
+
+
 	function controller(){
-		
+
 		if (isset($_REQUEST["state"])){$state=$_REQUEST["state"];}
 		else{$state="step1";}
-		
+
 		switch ($state){
-			
-			case "step1":				
+
+			case "step1":
 				$this->step1();
 				break;
-			
+
             case "step2":
                 $this->step2();
                 break;
 
             case "step3":
                 $this->step3();
-                break;            
-            
+                break;
+
             case "step4":
                 $this->step4();
                 break;
-			
+
 			case "step5":
                 $this->step5();
                 break;
@@ -57,47 +57,47 @@ putenv("DYLD_LIBRARY_PATH=" . getenv("MAGICK_HOME") . "/lib");
 			case "step6":
                 $this->step6();
                 break;
-			
+
 			case "processDirectory":
                 $_SESSION["currentDirectory"]=$_REQUEST["directory"];
 				$this->processDirectory();
                 //$this->convertImages($_REQUEST["directory"]);
-                
+
 				break;
-                
+
             case "convertImages":
                 $this->convertImages($_REQUEST["directory"]);
                 break;
-                
-                
+
+
             case "ftp":
                 $this->ftpConnect();
-                break; 
+                break;
 
 		}
 	}
-	
+
 
     function setCollections(){
-           
+
         include ("collections.php");
-        $this->collections=$collections;          
-        
+        $this->collections=$collections;
+
     }
-    
+
     function step1(){
-        
+
         if ($_REQUEST["clear"]=="true"){
             $this->emptyConverted();
             $this->emptyCSVs();
-            
-            
+
+
         }
-        
+
         ?>
-        
+
         <h3>Step 1: Add metadata to images in Adobe Bridge</h3>
-       
+
         <p>(add some detailed instructions/screenshots here)</p>
         <!--
         <p>Steps:</p>
@@ -114,53 +114,53 @@ putenv("DYLD_LIBRARY_PATH=" . getenv("MAGICK_HOME") . "/lib");
             <li>Go to <a href="index.php?state=step2">Step 2</a>.</li>
         </ul>
         -->
-        
+
         <?php
-        
+
     }
-    
+
 	function step2(){
-		
+
 		?>
-		
+
 		<h3>Step Two: Generate Omeka-ready CSV Files</h3>
 
 <p>Choose the directory containing your shoot export files and metadata.txt file.</p>
-            
+
 			<form action="index.php" method="post">
 			<select name="directory" id="expdir">
 				<option value="">Select Directory</option>
-				
+
 
 			<?php
 			$dir= pubcomda::parentdir;
 			 if ($handle = opendir($dir)) {
 			    while (false !== ($entry = readdir($handle))) {
 			        if ($entry != "." && $entry != "..") {
-			        	
+
 						$p="$dir/$entry";
 						if (is_dir($p)){echo "<option value='$entry'>$entry</option>";}
-			
+
 			        }
 			    }
 			    closedir($handle);
-			}	
+			}
 
 			?>
 			</select>
 			<input type="hidden" name="state" value="processDirectory">
-			
+
 			<p><input type="submit" value="Generate CSV Files" id="createCSV"></p>
 			</form>
 
 		  <?php
-		
-		
+
+
 	}
-	
-	
+
+
 	function step3(){
-	    
+
         ?>
         <h3>Batch Convert Images with Photoshop</h3>
         <p>Now batch convert the images to jpegs using photoshop:</p>
@@ -173,90 +173,90 @@ putenv("DYLD_LIBRARY_PATH=" . getenv("MAGICK_HOME") . "/lib");
                 		<li>In section 2, select the 'coverted' folder on your Desktop, and make sure 'Keep folder structure' is checked.</li>
                 		<li>In section 3, duplicate the settings as show below.</li>
                 	</ul>
-                <li>When settings are ready, click 'Run'. Photoshop will then create jpg versions of the raw image files.</li>	
+                <li>When settings are ready, click 'Run'. Photoshop will then create jpg versions of the raw image files.</li>
                 	 <br>
                 	<img src='img/image_processor_specs.png'>
-                	
+
                 </li>
-                
-                
+
+
             </ul>
-           <p>When finished, <a href='index.php?state=step4'>move on the step 4</a>.</p> 
-            
+           <p>When finished, <a href='index.php?state=step4'>move on the step 4</a>.</p>
+
         </p>
-        
-        
-        
-        
+
+
+
+
         <?php
 	}
 
 	function step4(){
 		?>
-		
+
 		<h3>FTP Raw and Converted Images to Server</h3>
-		
+
 		<p>Part 1: FTP Raw images:</p>
 		<ul>
 			<li>In FireFox, open a new tab, and click the FireFTP bookmark icon.</li>
 			<li>Click the drop-down menu in the upper left, select "pubcom-raw", and click 'Connect'.</li>
 			<li>In the left window, open the folder containing the raw image files, select the image files, and click the right-pointing arrow.<br/> This will start the FTP process.<br><img src='img/fireftp1.png'></li>
-			
+
 		</ul>
 		<p>Part 2: FTP Converted images:</p>
-	
+
 		<ul>
 			<li>When the process above is complete, click 'Disconnect'. </li>
 			<li>In the drop-down menu, select "pubcom-converted", and click "Connect".</li>
 			<li>Select all the jpg images in the left-hand window, and click the right pointing arrow, starting the FTP process.</li>
 			<li>When finished, move on to <a href='index.php?state=step5'>Step 5</a>.</li>
-			
+
 		</ul>
-	
-		
+
+
 		<?php
-		
+
 	}
-	
+
 	function step5(){
-	    ?> 
+	    ?>
 		<h3>Process CSV Files in Omeka</h3>
-		
+
 		<p>The following files must be processed in Omeka:</p>
 		<ul>
 		<?php
-		
+
 		if ($_SESSION["csvfiles"]){
-    		
+
     		$files=$_SESSION["csvfiles"];
             asort($files);
             foreach ($files as $key){
                 $file=$key["file"];
                 $path=$key["path"];
                 echo "<li><p><input type='checkbox' class='cb'><span> $file <br/>(Collection: $path)</span></p></li>";
-    
+
             }
 
-		
+
 		?>
 		</ul>
 
         <p>Using Firefox, go to the <a href='http://pubcomda.lclark.edu/admin' target='_blank'>pubcomda admin interface</a>, and sign in.
-            
-            <?php 
-            
+
+            <?php
+
             if (file_exists("./omekainfo.php")){
                    require_once("./omekainfo.php");
-                    echo "<br/>username: $username<br/>password $password";     
-                    
-                
+                    echo "<br/>username: $username<br/>password $password";
+
+
             }
-            
+
             ?>
-            
-            </p> 
-            
-            
+
+            </p>
+
+
         <p>For each file, follow the steps below:</p>
         <ul>
             <li>Click Csv Import on the left navigation menu.</li>
@@ -268,59 +268,59 @@ putenv("DYLD_LIBRARY_PATH=" . getenv("MAGICK_HOME") . "/lib");
             <li>On the next page, make sure the "files" column is checked on the last row (file).</li>
             <li>Click "Import CSV File". Refresh the page after 30 seconds or so to check the progress.</li>
             <li>Once the status of the import is completed, click Csv Import on the menu, and repeat the process with the next file (or proceed to <a href='index.php?state=step6'>Step 6</a>).</li>
-            
+
         </ul>
 
 
 		<?php
 		        }
         else{echo "<p>No files to process.</p>";}
-	
 
-		
-		
+
+
+
 	}
-	
+
 	function step6(){
 		?>
-		
+
 		<h3>Clear Desktop</h3>
-		
+
 		<p>Prep the Desktop for the next batch:</p>
 		<ul>
 		    <li><span>Empty/archive OmekaCSVFiles directory.</span> </li>
 		    <li><span>Empty "converted" directory.</span> </li>
-		    
-		    
-		    
+
+
+
 		</ul>
-		
+
 		<form action="index.php">
-		    
+
 		    <input type="hidden" name="clear" value="true">
 		    <input type="submit" value="Clear both directories and start a new batch">
-		    
-		    
-		    
+
+
+
 		</form>
-		
+
 		<p>You'll have to manually drag <span style="font-style:italic;"></span><?php echo $_SESSION["currentDirectory"]; ?></span> to the trash.</p>
-		
-		
-		
+
+
+
 		<?php
 		//$this->emptyConverted();
        // $this->emptyCSVs();
        // $this->emptyShootDirectory();
-		
-		//var_dump($_SESSION);
-		
-		
-	}
-	
-	
 
-    
+		//var_dump($_SESSION);
+
+
+	}
+
+
+
+
 
 
 
@@ -332,13 +332,13 @@ putenv("DYLD_LIBRARY_PATH=" . getenv("MAGICK_HOME") . "/lib");
 
 
 class utilities{
-    
-    
+
+
     function processDirectory(){
-        
+
         $_SESSION["csvfiles"]="";
-        
-        
+
+
         if (isset($_REQUEST["directory"]) && !empty($_REQUEST["directory"])){
             $directory=$_REQUEST["directory"];
             $this->directory=$directory;
@@ -346,20 +346,20 @@ class utilities{
             //echo $directory;
             /* gets metadata array from metadata.txt*/
          //   if ($md_array=$this->metadataDotTextCheck($directory)){
-                
+
                         //$a=$this->md_parse($md_array);
                         //var_dump($a);
 
                     /* gets exifdata from directory    */
                     $a=array();
-                    $keys=array();  
+                    $keys=array();
                     $ex_array=array();
-                    
-                    
-                    
-                    $dir= pubcomda::parentdir."/$directory";    
+
+
+
+                    $dir= pubcomda::parentdir."/$directory";
                     if ($handle = opendir($dir)) {
-        
+
                         while (false !== ($entry = readdir($handle))) {
                             if ($entry != "." && $entry != ".." && $entry != ".DS_Store" && $entry !="metadata.txt") {
                                 //echo "$entry<br>";
@@ -369,15 +369,15 @@ class utilities{
                                 $k=$b[0];
                                 $fileType=$b[1];
                                 array_push($keys,$k);
-                                
+
                                 $collinfo=$this->getFileCollection($k);
                                 $full=$collinfo["full"];
-       
-                                
+
+
                                 $exif=$this->exiftooldata($entry, $directory, $k);
-                                
+
                                // var_dump($exif);
-                                
+
                                 $a[$full][$k]["Dimensions"]=$exif["Dimensions"];
                                 $a[$full][$k]["Archive File"]=$entry;
                                 $a[$full][$k]["File Type"]=$fileType;
@@ -386,43 +386,43 @@ class utilities{
                                 $a[$full][$k]["Keywords"]=$exif["Keywords"];
                                 $a[$full][$k]["Shoot"]=$exif["Shoot"];
 								$a[$full][$k]["Photographer"]=$exif["Photographer"];
-                                
+
 
                             }
-                                    
-                                
-                            
+
+
+
                         }
-                    
-                    
-                    
+
+
+
                         closedir($handle);
-                    }           
+                    }
                     //var_dump($a);
 
-                    
+
                     $this->collectionArrayParse($a);
-            
+
                     echo "<p>Proceed to <a href='index.php?state=step3'>Step 3</a></p>";
            // }
 
-            
+
 
             #echo "<p><a href='index.php'>Start Again</a></p>";
         }
-        
+
         #echo "<p><a href='index.php'>Go back and pick a directory.</a></p>";
-        
+
         ?>
 
-        
-        
+
+
         <?php
-        
-        
-        
-        
-    }  
+
+
+
+
+    }
 
 
     function newSplitIt($string, $key){
@@ -430,58 +430,58 @@ class utilities{
         $whitelist=array("SourceFile","Keywords","ObjectName","ImageWidth","ImageHeight","Creator","DateTimeOriginal");
 
         $r=explode("=>",$string);
-        
+
         $field=trim($r[0], '" ');
         if (in_array($field, $whitelist)){
             $val=$r[1];
             $val=rtrim($val, ",");
-            
+
             switch ($field){
-                
+
                 case "SourceFile":
                     $title=$this->formatTitle($val);
-                    $pair["Title"]=$title;                  
+                    $pair["Title"]=$title;
                     break;
-                
+
                 case "Keywords":
                     $keywords=$this->formatKeywords($val);
                     $pair["Keywords"]=$keywords;
-                    break; 
-                
+                    break;
+
                 case "ObjectName":
                     $shoot=$this->formatShoot($val, $key);
                     $pair["Shoot"]=$shoot;
                     break;
-                
+
                 case "ImageWidth":
-                    $pair["Width"]=$val;                   
+                    $pair["Width"]=$val;
                     break;
-                
+
                 case "ImageHeight":
                     $pair["Height"]=$val;
                     break;
-                
+
                 case "Creator":
                     $photographer=$this->formatPhotographer($val);
                     $pair["Photographer"]=$photographer;
                     break;
-                        
+
                 case "DateTimeOriginal":
                     $date=$this->formatDate($val);
                     $pair["Date"]=$date;
-                    
+
                     break;
-    
-                
+
+
             }
-            
+
            // $pair[$field]=$value;
             return $pair;
-            
-            
-            
-           // return $val;            
-            
+
+
+
+           // return $val;
+
         }
         else {return false;}
 
@@ -490,125 +490,137 @@ class utilities{
     }
 
 
-    
+
     /* This will attempt to handle exiftool data smarter, so it relies on value matching rather than sequence*/
-  
+
     function exiftooldata($file, $folder, $key){
-        
+
             $exif=array();
 
-        $im=pubcomda::parentdir."/$folder/$file";
+						//$folder=str_replace(" ","\ ",$folder);
+						//$file=str_replace(" ","\ ",$file);
 
-        $command="exiftool -php -Keywords -ObjectName -ImageWidth -ImageHeight -Creator -DateTimeOriginal -MetadataDate \"$im\"";
+
+        $im="/Users/DIL/Desktop/$folder/$file";
+
+        $command="/usr/local/bin/exiftool -php -Keywords -ObjectName -ImageWidth -ImageHeight -Creator -DateTimeOriginal -MetadataDate \"$im\"";
+
+//echo $command;
+
+//exit();
+
+
+
+
 
         exec($command, $output, $return);
-        
+
         foreach ($output as $out){
-            
-            if ($pair=$this->newSplitIt($out, $key)){                
+
+            if ($pair=$this->newSplitIt($out, $key)){
                 $f=key($pair);
                 $v=$pair[$f];
                 $exif[$f]=$v;
-            }           
+            }
         }
 
         $wi=$exif["Width"];
         $he=$exif["Height"];
         $width= intval($wi);
-        $height=intval($he);        
+        $height=intval($he);
         $hd=round($height/300, 2, PHP_ROUND_HALF_EVEN);
         $wd=round($width/300, 2, PHP_ROUND_HALF_EVEN);
-        
+
         $dim="$hd in. x $wd in.";
         $exif["Dimensions"]=$dim;
 
-        
+
         return $exif;
-  
-    } 
-    
-	
-    
+
+    }
+
+
+
 
 	function formatPhotographer($cre){
-		
+
 		$photographer=trim($cre, '" ');
-		return $photographer;	
-		
+		return $photographer;
+
 	}
-	
-	
+
+
     function formatKeywords($kw){
-        
+
         $string="";
         // example: Array("academic","graduate campus","graduate school","indoors","people")
-        
+
         $a=str_replace("Array(", "", $kw);
         $b=str_replace(")", "", $a);
         $c=str_replace('"', '', $b);
-        
+
         $d=explode(",", $c);
-        
+
         $n=0;
         foreach ($d as $e){
-            
+
             $key=trim($e);
             if ($n==0){$string.=$key;}
             else{$string.=", ".$key;}
             $n++;
 
         }
-        
+
         //echo "<p>$c</p>";
-        
+
         $string=rtrim($string, " ,");
         return $string;
-        
-        
+
+
     }
-    
-    
+
+
     /* for a file name (no extension), like "CAM-B-0410-0023", returns array $array["prefix"]="CAM", $array["suffix"]="B", $array["full"]="CAM-B"*/
     function getFileCollection($file){
         $coll=array();
          $x=explode("-", $file);
         $f=$x[0];
         switch($f){
-            
+
             case "L":
-            case "G":            
-            $suffix=$x[1];                
+            case "G":
+            $suffix=$x[1];
             $key=$f."-".$suffix;
-            $sub=$x[2];                
+            $sub=$x[2];
             break;
-                
+
             default:
             $key=$x[0];
             $sub=$x[1];
-            break;    
+            break;
 
         }
         $coll["prefix"]=$key;
         $coll["suffix"]=$sub;
         $coll["full"]="$key-$sub";
-        return $coll;        
+        return $coll;
     }
 
 
     /*Interprets the file convention, like "CAM-B-0410-0023"*/
     function parseFilename($file){
-        
+
         $z=$this->getFileCollection($file);
-        
+
         $pre=$z["prefix"];
         $suf=$z["suffix"];
         $full=$z["full"];
-        
+
         $c=strlen($suf);
                 //echo "$key $sub $c";
         switch ($c){
             case 1:
-            
+
             $val=$this->collections[$pre][$suf];
             break;
 
@@ -616,76 +628,76 @@ class utilities{
                 $one=$suf[0];
                 $two=$suf[1];
                 $val=$this->collections[$pre][$one][$two];
-                
-                
-            break;     
-                
+
+
+            break;
+
             case 3:
                 $one=$suf[0];
                 $two=$suf[1];
                 $three=$suf[2];
-                $val=$this->collections[$pre][$one][$two][$three];                                                
+                $val=$this->collections[$pre][$one][$two][$three];
 
         }
-        
-        
+
+
         $r="$full||||$val";
-        return $r; 
+        return $r;
 
     }
-    
+
 
 
     function formatShoot($shoot, $title){
-        
+
         /* example title: G-PEO-C */
-        
+
         /* example shoot: CAS 100609 Campus Details*/
-        
+
         /*goal: CAS-0109-Athletics*/
         /*"GRAD 130619 Grad School" | G-PEO-C1-0613-0035*/
-        
+
         $shoot=trim($shoot, '" ');
-        
-        
+
+
         //echo "<p>$shoot | $title</p>";
-        
-        
+
+
         $x=explode(" ", $shoot);
-        
+
         $school=array_shift($x);
         $shootdate=array_shift($x);
         $desc=implode(" ", $x);
-        
+
         $y=explode("-", $title);
         $wrong=array_pop($y);
         $date=array_pop($y);
-        
+
         $new=$school."-".$date."-".$desc;
         return $new;
 
     }
-    
+
     function formatTitle($data){
         $x=explode("/", $data);
         $file=array_pop($x);
         $y=explode(".", $file);
         $title=$y[0];
         return $title;
-        
-        
-        
+
+
+
     }
-    
-    
-    
+
+
+
 	function formatDate($d){
-		
+
 		$d=trim($d,'" ');
 		//echo $d."<br>";
 		//ex: 2008:04:30 22:18:17
 		$x=explode(" ", $d);
-		
+
 		//var_dump($x);
 		$y=$x[0];
 	//	echo "<h1>$y</h1>";
@@ -697,90 +709,90 @@ class utilities{
 	   $date="$yyyy-$mm-$dd";
 		//$date= date('F j, Y', mktime(0, 0, 0, $mm, $dd, $yyyy));
 		return $date;
-		
+
 	}
 
 
 
 
     function collectionArrayParse($array){
-            
+
             /* limit of entries per CSV file*/
            $limit=150;
-           
-           
-            $c=0;    
+
+
+            $c=0;
            foreach ($array as $collection=>$data){
-               
+
                $x=array_chunk($data, $limit);
                $s=count($x);
                if ($s==1){$z=0;}
                else{$z=1;}
-               
-  
-               foreach ($x as $y){ 
-               
-               
+
+
+               foreach ($x as $y){
+
+
                    if ($csv=$this->writeCSV($y, $collection, $z)){
                        $path=$this->getCollectionPath($collection);
                        echo "<p>File created: $csv<br>($path)</p>";
                        $_SESSION["csvfiles"][$c]["file"]=$csv;
                        $_SESSION["csvfiles"][$c]["path"]=$path;
                        $c++;
-    
+
                    }
                    $z++;
                }
-                
 
-               // echo "<hr>";   
-                   
 
-           }     
+               // echo "<hr>";
+
+
+           }
 
     }
- 
- 
+
+
     function writeCSV($array, $collection, $suffix){
-            
+
             //$fields=array();
             $directory=$this->directory;
-            
-            
-            
+
+
+
         $dir= pubcomda::parentdir;
         $usageterms=pubcomda::usageTerms;
         $copyright=pubcomda::copyrightNotice;
-        
+
         if ($suffix==0){
             $csv=$collection."_".$directory.".csv";
-             
+
         }
         else{ /* adds a suffix if multiple files per collection */
             $csv=$collection."_".$directory."_".$suffix.".csv";
-            
+
         }
 
-        
-        
+
+
         //echo "<p>$csv</p>";
         $path="$dir/OmekaCSVfiles/$csv";
-        
-        //echo count($array);   
-        
+
+        //echo count($array);
+
         $fp = fopen($path, 'w+');
-        
-            
-        $headings=array("Dublin Core:Title", "Item Type Metadata:Shoot", "Item Type Metadata:Keywords", "Item Type Metadata:Instructions", "Item Type Metadata:Date", "Item Type Metadata:Photographer", "Item Type Metadata:City", "Item Type Metadata:State/Province", 
+
+
+        $headings=array("Dublin Core:Title", "Item Type Metadata:Shoot", "Item Type Metadata:Keywords", "Item Type Metadata:Instructions", "Item Type Metadata:Date", "Item Type Metadata:Photographer", "Item Type Metadata:City", "Item Type Metadata:State/Province",
         "Item Type Metadata:Country", "Item Type Metadata:Usage Terms", "Item Type Metadata:Copyright Notice", "Item Type Metadata:Rating", "Item Type Metadata:File Type", "Item Type Metadata:Maximum File Dimensions (print at 300dpi)", "file");
-        
+
         fputcsv($fp, $headings);
-        
-        
+
+
         foreach ($array as $key=>$md){
-            
+
             $fields=array();
-            
+
             array_push($fields, $md["Title"]);   //new exif data "title"
             array_push($fields, $md["Shoot"]);
             array_push($fields, $md["Keywords"]);
@@ -798,33 +810,33 @@ class utilities{
             $filepath="http://pubcomda.lclark.edu/tempfiles/".$md["Title"].".jpg";
             array_push($fields, $filepath);
             //var_dump($md);
-            
-            
+
+
             fputcsv($fp, $fields);
-            
+
         }
         if ($fp){return $csv;}
         else{return false;}
 
     }
- 
- 
- 
- 
-    
+
+
+
+
+
     function getCollectionPath($coll){
-                
-            
+
+
         $collections=$this->collections;
         $data=$this->getFileCollection($coll);
         $pre=$data["prefix"];
         $suf=$data["suffix"];
-        
+
         $path="";
         if ($collections[$pre]["parentlabel"]){
             $path= $collections[$pre]["parentlabel"] ." -> ";
-            
-            
+
+
         }
 
         $r="";
@@ -838,33 +850,33 @@ class utilities{
             case 2:
                 $one=$suf[0];
                 $two=$suf[1];
-                
+
                 $r=$collections[$pre][$one]["parentlabel"]. " -> ";
                 $r.=$collections[$pre][$one][$two];
-                
-                
-            break;     
-                
+
+
+            break;
+
             case 3:
                 $one=$suf[0];
                 $two=$suf[1];
                 $three=$suf[2];
                  $r=$collections[$pre][$one]["parentlabel"]." -> ";
                 $r.=$collections[$pre][$one][$two]["parentlabel"]." -> ";
- 
-                $r.=$collections[$pre][$one][$two][$three];                                                
+
+                $r.=$collections[$pre][$one][$two][$three];
 
         }
         $path.=$r;
-        
-        return $path;            
-        
-        
-        
-        
-        
-        
-        
+
+        return $path;
+
+
+
+
+
+
+
     }
 
 
@@ -874,96 +886,96 @@ class utilities{
 
 
 
-    
+
     function emptyConverted(){
         $converted=pubcomda::parentdir."/converted";
         $command="rm $converted/*.jpg";
-        if (exec($command)){            
-            return true;            
+        if (exec($command)){
+            return true;
         }
 
     }
-    
+
     function emptyCSVs(){
         $csvs=pubcomda::parentdir."/OmekaCSVfiles";
         $command="rm $csvs/*.csv";
-        if (exec($command)){            
+        if (exec($command)){
             return true;
 
         }
 
-        
+
     }
-    
+
 /* OLD FUNCTIONS FROM INITIAL MIGRATION    */
  /*   function md_parse($md){
-        
+
         $csv_prep=array();
-        
+
         $coll_array=array();
 
         foreach ($md as $entry){
-            
+
             $c=0;
-            
+
             foreach ($entry as $field=>$value){
-                                    
-                        
-                 $field=iconv("UTF-16", "UTF-8",utf8_encode($field));       
-                 $value=iconv("UTF-16", "UTF-8",utf8_encode($value));   
-                
-                
+
+
+                 $field=iconv("UTF-16", "UTF-8",utf8_encode($field));
+                 $value=iconv("UTF-16", "UTF-8",utf8_encode($value));
+
+
                 if ($c==0){
-                    
+
                     if (strlen($value)<10){$key=false;}
                     else{$key=$value;}
                     if ($key){
                     //echo "<p>key: $value</p>";
-                        
+
                         $r=$this->parseFilename($value);
                         $k=explode("||||", $r);
                         $coll=$k[0];
                         if (!in_array($coll, $coll_array)){
                            # array_push($coll_array, $coll);
-                            
+
                         }
-                        
+
                         $coll_array[$coll][$key]["Filename"]=$value;
 
                         $csv_prep[$key]["Filename"]=$value;
-                        
+
                     }
                 }
                 else{
                     if ($key){
-                        
+
                         //echo "<p>$c $field: $value</p>";
-                        
-                        
-                        
+
+
+
                         switch ($field) {
                             case "Title":   //title
                                 //echo "<p>$field: $value</p>";
                                 //$csv_prep[$key]["Shoot"]=$value;
-                                
+
                                 $newdata=$this->formatShoot($value, $key);
-                                
+
                                 $coll_array[$coll][$key]["Shoot"]=$newdata;
                                 break;
-                            
+
                             case "Contact Creator":
                                 //$csv_prep[$key]["Photographer"]=$value;
                                 $coll_array[$coll][$key]["Photographer"]=$value;
                                 break;
-                            
+
                             case "Keywords":
-                                
+
                                 $keywords=str_replace(",", ", ", $value);
                                 $keywords=rtrim($keywords);
-                                
+
                                 $coll_array[$coll][$key][$field]=$keywords;
-                                
-                                
+
+
                                 break;
                             case "Instructions":
                             case "City":
@@ -973,73 +985,73 @@ class utilities{
                                 //$csv_prep[$key][$field]=$value;
                                 $coll_array[$coll][$key][$field]=$value;
                                 break;
-                            
+
                             default:
                                 //$csv_prep[$key][$field]=$value;
                                 break;
                         }
-                        
-                        
+
+
                         //echo "<p>$field: $value</p>";
-                    
-                    
-                    
+
+
+
                     }
-                    
+
                 }
 
-                
+
                 $c++;
             }
-            
+
 
         }
     //  $this->collectionArrayParse($coll_array);
-        
+
         //return $csv_prep;
-        
+
         return $coll_array;
-        
+
     } */
-/*  
+/*
     function metadataDotTextCheck($directory){
-            $dir= pubcomda::parentdir."/$directory";    
+            $dir= pubcomda::parentdir."/$directory";
             $md=$dir."/metadata.txt";
             //echo $md;
-            
+
             if (file_exists($md)){
                 $md_array=$this->parse_reports($md);
                 return $md_array;
             }
-            else{return false;}         
+            else{return false;}
 
     }
-  */  
+  */
 /*
- *  function parse_reports($filename){ 
-         
-            $mappings = array(); 
-            $id = fopen($filename, "r"); //open the file 
-            $data = fgetcsv($id, filesize($filename), "\t");  
-             
-            if(!$mappings){ 
-                $mappings = $data; 
-            } 
-             
-            while($data = fgetcsv($id, filesize($filename), "\t")){ 
-                if($data[0]){ 
-                    foreach($data as $key => $value) 
-                        $converted_data[$mappings[$key]] = $value; 
-                        $arr[] = $converted_data;  
-                         
-                }  
-            }   
-             
-            fclose($id); //close file 
+ *  function parse_reports($filename){
+
+            $mappings = array();
+            $id = fopen($filename, "r"); //open the file
+            $data = fgetcsv($id, filesize($filename), "\t");
+
+            if(!$mappings){
+                $mappings = $data;
+            }
+
+            while($data = fgetcsv($id, filesize($filename), "\t")){
+                if($data[0]){
+                    foreach($data as $key => $value)
+                        $converted_data[$mappings[$key]] = $value;
+                        $arr[] = $converted_data;
+
+                }
+            }
+
+            fclose($id); //close file
             //var_dump($arr);
-            
-            return $arr; 
-        } 
+
+            return $arr;
+        }
      function exiftooldata_old($file, $folder, $key){
             $exif=array();
 
@@ -1056,7 +1068,7 @@ class utilities{
         $h=$output[5];
         $cr=$output[6];
         $dt=$output[7];
-        
+
         $source=$this->splitit($s);
         $wi=$this->splitit($w);
         $he=$this->splitit($h);
@@ -1064,58 +1076,58 @@ class utilities{
         $kw=$this->splitit($k);
         $sho=$this->splitit($on);
         $cre=$this->splitit($cr);
-        
-        
-        
+
+
+
         $keywords=$this->formatKeywords($kw);
         //echo "<br>$source | $width | $height<br>";
-        
+
         $title=$this->formatTitle($source);
         $shoot=$this->formatShoot($sho, $key);
         $photographer=$this->formatPhotographer($cre);
         echo "<p>$photographer</p>";
-        
+
         //echo "<p>title: $title</p>";
         $exif["Title"]=$title;
         $exif["Keywords"]=$keywords;
         $exif["Shoot"]=$shoot;
         $exif["Photographer"]=$photographer;
-        
+
         $width= intval($wi);
         $height=intval($he);
-        
+
         $hd=round($height/300, 2, PHP_ROUND_HALF_EVEN);
         $wd=round($width/300, 2, PHP_ROUND_HALF_EVEN);
-        
+
         $dim="$hd in. x $wd in.";
         $exif["Dimensions"]=$dim;
-        
-        
+
+
         $date=$this->formatDate($da);
         $exif["Date"]=$date;
-        
+
         return $exif;
-   
-        
-        
+
+
+
     }
     function splitit($string){
-        
+
         $r=explode("=>",$string);
         $val=$r[1];
         $val=rtrim($val, ",");
         return $val;
 
-    }    
- * 
- * 
+    }
+ *
+ *
  * */
 
 
 
- 
 
- 
-		
+
+
+
 }
 ?>
