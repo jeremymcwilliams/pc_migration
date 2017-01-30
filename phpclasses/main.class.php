@@ -497,7 +497,9 @@ class utilities{
         
             $exif=array();
 
-        $im=pubcomda::parentdir."/$folder/$file";
+       // $im=pubcomda::parentdir."/$folder/$file";
+        
+        $im="/Users/DIL/Desktop/$folder/$file";
 
         $command="exiftool -php -Keywords -ObjectName -ImageWidth -ImageHeight -Creator -DateTimeOriginal -MetadataDate \"$im\"";
 
