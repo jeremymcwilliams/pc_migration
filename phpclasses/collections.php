@@ -193,7 +193,10 @@
                 "15"=>"Fall 2015 (MISC-D15)",
                 "16"=>"Winter 2016 (MISC-D16)",
                 "17"=>"Spring 2016 (MISC-D17)",
-                "18"=>"Fall 2016 (MISC-D18)"
+                "18"=>"Fall 2016 (MISC-D18)",
+                "19"=>"Winter 2017 (MISC-D19)",
+                "20"=>"Spring 2017 (MISC-D20)",
+                "21"=>"Fall 2017 (MISC-D21)"
             ),
             "E"=>"Hoffman Gallery Shows (MISC-E)",
             "F"=>array( /* Print Project   */
