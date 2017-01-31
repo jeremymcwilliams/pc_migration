@@ -497,9 +497,9 @@ class utilities{
 
             $exif=array();
 
-<<<<<<< HEAD
-						//$folder=str_replace(" ","\ ",$folder);
-						//$file=str_replace(" ","\ ",$file);
+
+
+						
 
 
         $im="/Users/DIL/Desktop/$folder/$file";
@@ -512,11 +512,10 @@ class utilities{
 
 
 
-=======
+
        /* $im=pubcomda::parentdir."/$folder/$file"; */
         
         $im="/Users/DIL/Desktop/$folder/$file";
->>>>>>> origin/master
 
 
         exec($command, $output, $return);
