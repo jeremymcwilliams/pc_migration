@@ -500,6 +500,9 @@ class utilities{
 
 
 						
+						//$folder=str_replace(" ","\ ",$folder);
+						//$file=str_replace(" ","\ ",$file);
+
 
 
         $im="/Users/DIL/Desktop/$folder/$file";
@@ -513,10 +516,9 @@ class utilities{
 
 
 
-       /* $im=pubcomda::parentdir."/$folder/$file"; */
+       
         
-        $im="/Users/DIL/Desktop/$folder/$file";
-
+        
 
         exec($command, $output, $return);
 
